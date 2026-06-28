@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MotoPartsHub - อะไหล่มอเตอร์ไซค์ครบวงจร</title>
+<style>
+  :root {
+    --bg-primary: #111111;
+    --bg-secondary: #1E1E1E;
+    --bg-card: #2B2B2B;
+    --accent: #D50000;
+    --accent-hover: #B71C1C;
+    --accent-light: rgba(213,0,0,0.12);
+    --text-primary: #FFFFFF;
+    --text-secondary: #B0B0B0;
+    --text-muted: #707070;
+    --border: rgba(255,255,255,0.08);
+    --border-accent: rgba(213,0,0,0.4);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.5);
+    --font: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg-primary); color:var(--text-primary); font-family:var(--font); overflow-x:hidden; }
+
+  /* HEADER */
+  .header { background:var(--bg-secondary); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+  .header-top { background:var(--accent); padding:6px 24px; display:flex; justify-content:space-between; align-items:center; font-size:12px; }
+  .header-top span { color:#fff; }
+  .header-top-links { display:flex; gap:16px; }
+  .header-top-links a { color:#fff; text-decoration:none; opacity:.9; transition:opacity .2s; }
+  .header-top-links a:hover { opacity:1; }
+  .header-main { display:flex; align-items:center; gap:16px; padding:12px 24px; }
+  .logo { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }
+  .logo-icon { width:40px; height:40px; background:var(--accent); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; }
+  .logo-icon svg { width:24px; height:24px; fill:#fff; }
+  .logo-text { line-height:1.1; }
+  .logo-name { font-size:18px; font-weight:700; color:#fff; letter-spacing:.5px; }
+  .logo-sub { font-size:10px; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase; }
+  .search-bar { flex:1; display:flex; max-width:600px; }
+  .search-select { background:var(--bg-card); color:var(--text-secondary); border:1px solid var(--border); border-right:none; padding:0 12px; border-radius:var(--radius-sm) 0 0 var(--radius-sm); font-size:13px; cursor:pointer; white-space:nowrap; }
+  .search-input { flex:1; background:var(--bg-card); color:var(--text-primary); border:1px solid var(--border); padding:10px 14px; font-size:14px; outline:none; border-left:none; border-right:none; }
+  .search-input::placeholder { color:var(--text-muted); }
+  .search-btn { background:var(--accent); color:#fff; border:none; padding:10px 18px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; cursor:pointer; font-size:16px; transition:background .2s; }
+  .search-btn:hover { background:var(--accent-hover); }
+  .header-actions { display:flex; align-items:center; gap:4px; margin-left:auto; }
+  .action-btn { background:none; border:none; color:var(--text-secondary); cursor:pointer; padding:8px 10px; border-radius:var(--radius-sm); display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10px; transition:color .2s, background .2s; position:relative; }
+  .action-btn:hover { color:#fff; background:var(--bg-card); }
+  .action-btn svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.8; }
+  .action-btn .badge { position:absolute; top:4px; right:6px; background:var(--accent); color:#fff; font-size:9px; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
+  .lang-curr { display:flex; gap:4px; }
+  .lang-curr select { background:var(--bg-card); color:var(--text-secondary); border:1px solid var(--border); padding:6px 8px; border-radius:var(--radius-sm); font-size:12px; cursor:pointer; }
+
+  /* NAV */
+  .nav { background:var(--bg-secondary); border-bottom:1px solid var(--border); overflow-x:auto; }
+  .nav-inner { display:flex; align-items:center; padding:0 24px; white-space:nowrap; gap:0; }
+  .nav-item { color:var(--text-secondary); text-decoration:none; padding:12px 14px; font-size:13px; font-weight:500; transition:color .2s; position:relative; display:flex; align-items:center; gap:4px; }
+  .nav-item:hover, .nav-item.active { color:var(--text-primary); }
+  .nav-item.active::after { content:''; position:absolute; bottom:0; left:14px; right:14px; height:2px; background:var(--accent); border-radius:2px 2px 0 0; }
+  .nav-item.brand-honda { color:#cc0000; }
+  .nav-item.brand-yamaha { color:#003087; }
+  .nav-item.brand-yamaha:hover { color:#1565c0; }
+  .nav-item.brand-honda:hover { color:#e53935; }
+  .nav-item.brand-suzuki { color:#0099cc; }
+  .nav-item.brand-suzuki:hover { color:#0288d1; }
+  .nav-item.brand-kawasaki { color:#4caf50; }
+  .nav-item.brand-kawasaki:hover { color:#66bb6a; }
+  .nav-divider { width:1px; height:20px; background:var(--border); margin:0 4px; flex-shrink:0; }
+  .nav-promo { color:var(--accent) !important; }
+
+  /* HERO BANNER */
+  .hero { position:relative; height:520px; overflow:hidden; background:var(--bg-secondary); }
+  .hero-slide { position:absolute; inset:0; display:flex; align-items:center; opacity:0; transition:opacity .8s; }
+  .hero-slide.active { opacity:1; }
+  .hero-bg { position:absolute; inset:0; }
+  .hero-bg-1 { background:linear-gradient(135deg, #0a0a0a 0%, #1a0000 40%, #2d0000 100%); }
+  .hero-bg-2 { background:linear-gradient(135deg, #0a0a0a 0%, #001520 40%, #002030 100%); }
+  .hero-bg-3 { background:linear-gradient(135deg, #0a0a0a 0%, #0d1a00 40%, #1a2d00 100%); }
+  .hero-grid { position:absolute; inset:0; background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 40px), repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 40px); }
+  .hero-moto { position:absolute; right:-5%; bottom:0; width:55%; max-width:700px; opacity:.85; }
+  .hero-moto svg { width:100%; height:100%; }
+  .hero-content { position:relative; z-index:2; padding:0 48px; max-width:600px; }
+  .hero-badge { display:inline-flex; align-items:center; gap:6px; background:var(--accent-light); border:1px solid var(--border-accent); color:var(--accent); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; margin-bottom:16px; }
+  .hero-title { font-size:52px; font-weight:800; line-height:1.05; letter-spacing:-1px; margin-bottom:12px; }
+  .hero-title span { color:var(--accent); }
+  .hero-subtitle { font-size:16px; color:var(--text-secondary); line-height:1.6; margin-bottom:28px; max-width:420px; }
+  .hero-btns { display:flex; gap:12px; flex-wrap:wrap; }
+  .btn-primary { background:var(--accent); color:#fff; border:none; padding:13px 28px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; letter-spacing:.3px; display:flex; align-items:center; gap:8px; }
+  .btn-primary:hover { background:var(--accent-hover); transform:translateY(-1px); }
+  .btn-secondary { background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.3); padding:13px 28px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:8px; }
+  .btn-secondary:hover { border-color:#fff; background:rgba(255,255,255,.05); }
+  .hero-stats { position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,.6); backdrop-filter:blur(12px); border-top:1px solid var(--border); display:flex; justify-content:center; gap:0; }
+  .hero-stat { padding:14px 40px; text-align:center; border-right:1px solid var(--border); }
+  .hero-stat:last-child { border-right:none; }
+  .hero-stat-num { font-size:22px; font-weight:700; color:#fff; }
+  .hero-stat-num span { color:var(--accent); }
+  .hero-stat-label { font-size:11px; color:var(--text-muted); letter-spacing:.5px; text-transform:uppercase; margin-top:2px; }
+  .hero-dots { position:absolute; bottom:70px; left:50%; transform:translateX(-50%); display:flex; gap:6px; z-index:3; }
+  .hero-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.3); cursor:pointer; transition:all .3s; }
+  .hero-dot.active { width:20px; border-radius:3px; background:var(--accent); }
+
+  /* BRANDS SECTION */
+  .section { padding:56px 24px; }
+  .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
+  .section-title { font-size:22px; font-weight:700; display:flex; align-items:center; gap:10px; }
+  .section-title::before { content:''; width:4px; height:24px; background:var(--accent); border-radius:2px; display:block; }
+  .section-link { color:var(--accent); font-size:13px; text-decoration:none; display:flex; align-items:center; gap:4px; transition:gap .2s; }
+  .section-link:hover { gap:8px; }
+
+  .brand-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px; }
+  .brand-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:20px 12px; text-align:center; cursor:pointer; transition:all .25s; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .brand-card:hover { border-color:var(--accent); background:#2f2f2f; transform:translateY(-3px); box-shadow:0 8px 24px rgba(213,0,0,.15); }
+  .brand-logo { font-size:13px; font-weight:700; color:var(--text-primary); letter-spacing:.5px; }
+  .brand-count { font-size:11px; color:var(--text-muted); }
+  .brand-icon { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; }
+
+  /* CATEGORY TABS */
+  .cat-tabs { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:20px; }
+  .cat-tab { background:var(--bg-card); color:var(--text-secondary); border:1px solid var(--border); padding:8px 16px; border-radius:20px; font-size:13px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+  .cat-tab:hover, .cat-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  /* PRODUCT GRID */
+  .product-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px; }
+  .product-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; cursor:pointer; transition:all .25s; position:relative; }
+  .product-card:hover { border-color:rgba(213,0,0,.4); transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.4); }
+  .product-badge { position:absolute; top:10px; left:10px; z-index:2; }
+  .badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; text-transform:uppercase; letter-spacing:.3px; }
+  .badge-sale { background:var(--accent); color:#fff; }
+  .badge-new { background:#1565c0; color:#fff; }
+  .badge-hot { background:#e65100; color:#fff; }
+  .badge-oom { background:#424242; color:#fff; }
+  .product-img { height:160px; background:var(--bg-secondary); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+  .product-img-placeholder { font-size:48px; opacity:.3; }
+  .product-wishlist { position:absolute; top:8px; right:8px; background:rgba(0,0,0,.5); border:none; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-muted); transition:all .2s; }
+  .product-wishlist:hover { color:var(--accent); background:rgba(213,0,0,.2); }
+  .product-wishlist svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; }
+  .product-info { padding:12px; }
+  .product-brand { font-size:10px; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+  .product-name { font-size:13px; color:var(--text-primary); font-weight:500; line-height:1.4; margin-bottom:6px; }
+  .product-sku { font-size:11px; color:var(--text-muted); margin-bottom:8px; }
+  .product-rating { display:flex; align-items:center; gap:4px; margin-bottom:8px; }
+  .stars { color:#f59e0b; font-size:12px; }
+  .rating-count { font-size:11px; color:var(--text-muted); }
+  .product-price { display:flex; align-items:baseline; gap:8px; margin-bottom:10px; }
+  .price-current { font-size:18px; font-weight:700; color:#fff; }
+  .price-original { font-size:13px; color:var(--text-muted); text-decoration:line-through; }
+  .price-discount { font-size:11px; color:#4caf50; font-weight:600; }
+  .product-footer { display:flex; gap:8px; }
+  .btn-cart { flex:1; background:var(--accent); color:#fff; border:none; padding:8px; border-radius:var(--radius-sm); font-size:12px; font-weight:600; cursor:pointer; transition:background .2s; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .btn-cart:hover { background:var(--accent-hover); }
+  .btn-cart svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2.2; }
+  .btn-compare { background:var(--bg-secondary); color:var(--text-muted); border:1px solid var(--border); padding:8px 10px; border-radius:var(--radius-sm); cursor:pointer; transition:all .2s; display:flex; align-items:center; }
+  .btn-compare:hover { color:#fff; border-color:#fff; }
+  .btn-compare svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; }
+
+  /* PROMO BANNERS */
+  .promo-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
+  .promo-card { border-radius:var(--radius-lg); padding:28px 24px; position:relative; overflow:hidden; cursor:pointer; transition:transform .25s; }
+  .promo-card:hover { transform:scale(1.02); }
+  .promo-1 { background:linear-gradient(135deg, #1a0000, #3d0000); border:1px solid rgba(213,0,0,.3); }
+  .promo-2 { background:linear-gradient(135deg, #001520, #003050); border:1px solid rgba(0,100,200,.3); }
+  .promo-3 { background:linear-gradient(135deg, #0d1a00, #1a3400); border:1px solid rgba(50,150,0,.3); }
+  .promo-tag { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .promo-1 .promo-tag { color:var(--accent); }
+  .promo-2 .promo-tag { color:#64b5f6; }
+  .promo-3 .promo-tag { color:#81c784; }
+  .promo-title { font-size:20px; font-weight:700; color:#fff; line-height:1.2; margin-bottom:6px; }
+  .promo-sub { font-size:13px; color:rgba(255,255,255,.6); margin-bottom:16px; }
+  .promo-btn { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:#fff; text-decoration:none; transition:gap .2s; }
+  .promo-btn:hover { gap:10px; }
+
+  /* FLASH SALE */
+  .flash-sale-header { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+  .flash-badge { background:var(--accent); color:#fff; padding:4px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; display:flex; align-items:center; gap:6px; }
+  .countdown { display:flex; gap:6px; align-items:center; }
+  .countdown-unit { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:4px 10px; text-align:center; }
+  .countdown-num { font-size:18px; font-weight:700; color:#fff; font-variant-numeric:tabular-nums; }
+  .countdown-label { font-size:9px; color:var(--text-muted); }
+  .countdown-sep { font-size:18px; color:var(--accent); font-weight:700; }
+
+  /* FEATURES */
+  .features-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; }
+  .feature-card { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-md); padding:20px; display:flex; gap:14px; align-items:flex-start; transition:border-color .2s; }
+  .feature-card:hover { border-color:var(--accent); }
+  .feature-icon { width:44px; height:44px; background:var(--accent-light); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .feature-icon svg { width:22px; height:22px; stroke:var(--accent); fill:none; stroke-width:1.8; }
+  .feature-title { font-size:14px; font-weight:600; color:#fff; margin-bottom:4px; }
+  .feature-desc { font-size:12px; color:var(--text-muted); line-height:1.5; }
+
+  /* NEWSLETTER */
+  .newsletter { background:var(--bg-secondary); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:48px 24px; text-align:center; }
+  .newsletter-title { font-size:26px; font-weight:700; margin-bottom:8px; }
+  .newsletter-sub { font-size:15px; color:var(--text-secondary); margin-bottom:24px; }
+  .newsletter-form { display:flex; gap:0; max-width:500px; margin:0 auto; }
+  .newsletter-input { flex:1; background:var(--bg-card); color:#fff; border:1px solid var(--border); border-right:none; padding:12px 18px; border-radius:var(--radius-sm) 0 0 var(--radius-sm); font-size:14px; outline:none; }
+  .newsletter-input::placeholder { color:var(--text-muted); }
+  .newsletter-btn { background:var(--accent); color:#fff; border:none; padding:12px 24px; border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-size:14px; font-weight:600; cursor:pointer; }
+
+  /* FOOTER */
+  .footer { background:var(--bg-secondary); border-top:1px solid var(--border); padding:48px 24px 24px; }
+  .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:32px; margin-bottom:40px; }
+  .footer-brand { }
+  .footer-logo-text { font-size:20px; font-weight:700; color:#fff; margin-bottom:8px; }
+  .footer-logo-sub { font-size:12px; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:14px; }
+  .footer-desc { font-size:13px; color:var(--text-secondary); line-height:1.6; margin-bottom:20px; max-width:260px; }
+  .social-links { display:flex; gap:8px; }
+  .social-btn { width:36px; height:36px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:var(--text-muted); cursor:pointer; transition:all .2s; text-decoration:none; font-size:15px; }
+  .social-btn:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .footer-col-title { font-size:13px; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.5px; margin-bottom:16px; }
+  .footer-links { display:flex; flex-direction:column; gap:8px; }
+  .footer-link { color:var(--text-secondary); text-decoration:none; font-size:13px; transition:color .2s; }
+  .footer-link:hover { color:var(--accent); }
+  .footer-bottom { border-top:1px solid var(--border); padding-top:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+  .footer-copy { font-size:12px; color:var(--text-muted); }
+  .footer-payments { display:flex; gap:6px; }
+  .payment-badge { background:var(--bg-card); border:1px solid var(--border); border-radius:4px; padding:3px 8px; font-size:11px; font-weight:600; color:var(--text-secondary); }
+  .payment-badge.visa { color:#1a1aff; }
+  .payment-badge.mc { color:#eb001b; }
+  .payment-badge.pp { color:#003087; }
+  .payment-badge.qr { color:#4caf50; }
+
+  /* RESPONSIVE */
+  @media(max-width:900px) {
+    .hero { height:auto; min-height:400px; }
+    .hero-content { padding:40px 24px; }
+    .hero-title { font-size:36px; }
+    .hero-moto { display:none; }
+    .features-grid { grid-template-columns:repeat(2,1fr); }
+    .promo-grid { grid-template-columns:1fr; }
+    .footer-grid { grid-template-columns:1fr 1fr; }
+    .hero-stats { flex-wrap:wrap; }
+  }
+  @media(max-width:600px) {
+    .header-main { flex-wrap:wrap; gap:10px; }
+    .search-bar { order:3; width:100%; max-width:100%; }
+    .header-actions { gap:0; }
+    .hero-title { font-size:28px; }
+    .product-grid { grid-template-columns:repeat(2,1fr); }
+    .features-grid { grid-template-columns:1fr; }
+    .footer-grid { grid-template-columns:1fr; }
+    .promo-grid { grid-template-columns:1fr; }
+    .brand-grid { grid-template-columns:repeat(3,1fr); }
+  }
+
+  /* MINI CART DRAWER (hidden initially) */
+  .cart-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200; opacity:0; pointer-events:none; transition:opacity .3s; }
+  .cart-overlay.open { opacity:1; pointer-events:all; }
+  .cart-drawer { position:fixed; top:0; right:-400px; width:380px; height:100%; background:var(--bg-secondary); border-left:1px solid var(--border); z-index:201; transition:right .3s; overflow-y:auto; display:flex; flex-direction:column; }
+  .cart-drawer.open { right:0; }
+  .cart-drawer-header { padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .cart-drawer-title { font-size:16px; font-weight:700; }
+  .cart-close { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:20px; padding:4px; border-radius:4px; }
+  .cart-close:hover { color:#fff; }
+  .cart-items { flex:1; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .cart-item { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:12px; display:flex; gap:12px; align-items:center; }
+  .cart-item-img { width:60px; height:60px; background:var(--bg-secondary); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+  .cart-item-info { flex:1; }
+  .cart-item-name { font-size:13px; font-weight:500; margin-bottom:4px; }
+  .cart-item-price { font-size:14px; font-weight:700; color:var(--accent); }
+  .cart-item-qty { display:flex; align-items:center; gap:8px; margin-top:6px; }
+  .qty-btn { background:var(--bg-secondary); border:1px solid var(--border); color:#fff; width:24px; height:24px; border-radius:4px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; }
+  .qty-btn:hover { border-color:var(--accent); }
+  .qty-num { font-size:13px; font-weight:600; min-width:20px; text-align:center; }
+  .cart-footer { padding:16px; border-top:1px solid var(--border); }
+  .cart-total { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .cart-total-label { font-size:14px; color:var(--text-secondary); }
+  .cart-total-price { font-size:20px; font-weight:700; color:#fff; }
+  .btn-checkout { width:100%; background:var(--accent); color:#fff; border:none; padding:14px; border-radius:var(--radius-sm); font-size:15px; font-weight:700; cursor:pointer; transition:background .2s; }
+  .btn-checkout:hover { background:var(--accent-hover); }
+
+  /* SCROLL ANIMATION */
+  .reveal { opacity:0; transform:translateY(20px); transition:opacity .5s, transform .5s; }
+  .reveal.visible { opacity:1; transform:none; }
+
+  /* MOTORCYCLE SVG */
+  .moto-svg-container { width:100%; height:400px; display:flex; align-items:flex-end; justify-content:flex-end; padding-right:5%; }
+</style>
+</head>
+<body>
+
+<!-- HEADER TOP BAR -->
+<div class="header-top">
+  <span>🏍️ จัดส่งฟรีทั่วไทย เมื่อซื้อครบ ฿2,500 | Free Worldwide Shipping on orders over $100</span>
+  <div class="header-top-links">
+    <a href="#">ติดตามคำสั่งซื้อ</a>
+    <a href="#">ศูนย์ช่วยเหลือ</a>
+    <a href="#">บล็อก</a>
+  </div>
+</div>
+
+<!-- HEADER MAIN -->
+<header class="header">
+  <div class="header-main">
+    <a href="#" class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C7 2 3 6 3 11c0 2.5 1 4.8 2.7 6.4L3 20h18l-2.7-2.6C20 15.8 21 13.5 21 11c0-5-4-9-9-9zm-2 13l-1-3 6-5-2 4 2 1-5 3z"/></svg>
+      </div>
+      <div class="logo-text">
+        <div class="logo-name">MotoPartsHub</div>
+        <div class="logo-sub">Motorcycle Parts Marketplace</div>
+      </div>
+    </a>
+
+    <div class="search-bar">
+      <select class="search-select">
+        <option>ทุกหมวดหมู่</option>
+        <option>Honda</option>
+        <option>Yamaha</option>
+        <option>Suzuki</option>
+        <option>Kawasaki</option>
+        <option>OEM Parts</option>
+        <option>Aftermarket</option>
+      </select>
+      <input type="text" class="search-input" placeholder="ค้นหาอะไหล่ รุ่น หรือ Part Number..." />
+      <button class="search-btn">🔍</button>
+    </div>
+
+    <div class="header-actions">
+      <div class="lang-curr">
+        <select><option>🇹🇭 TH</option><option>🇺🇸 EN</option></select>
+        <select><option>THB ฿</option><option>USD $</option><option>EUR €</option><option>JPY ¥</option><option>SGD S$</option></select>
+      </div>
+      <button class="action-btn" onclick="toggleCart()">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span>Wishlist</span>
+        <span class="badge">3</span>
+      </button>
+      <button class="action-btn">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>Compare</span>
+      </button>
+      <button class="action-btn" onclick="toggleCart()">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+        <span>Cart</span>
+        <span class="badge">5</span>
+      </button>
+      <button class="action-btn">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Login</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- NAVIGATION -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-item active">🏠 Home</a>
+      <div class="nav-divider"></div>
+      <a href="#" class="nav-item brand-honda">● Honda</a>
+      <a href="#" class="nav-item brand-yamaha">● Yamaha</a>
+      <a href="#" class="nav-item brand-suzuki">● Suzuki</a>
+      <a href="#" class="nav-item brand-kawasaki">● Kawasaki</a>
+      <div class="nav-divider"></div>
+      <a href="#" class="nav-item">OEM Parts</a>
+      <a href="#" class="nav-item">Aftermarket</a>
+      <a href="#" class="nav-item">Replacement</a>
+      <div class="nav-divider"></div>
+      <a href="#" class="nav-item">⭐ Recommended</a>
+      <a href="#" class="nav-item nav-promo">🔥 Promotions</a>
+      <a href="#" class="nav-item">📞 Contact</a>
+    </div>
+  </nav>
+</header>
+
+<!-- HERO BANNER -->
+<section class="hero">
+  <div class="hero-slide active" id="slide-0">
+    <div class="hero-bg hero-bg-1"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-badge">⚡ อะไหล่แท้ รับประกันคุณภาพ</div>
+      <h1 class="hero-title">Motorcycle<br>Parts <span>Marketplace</span></h1>
+      <p class="hero-subtitle">อะไหล่แท้และอะไหล่ทดแทนจากผู้ผลิตชั้นนำ รองรับมากกว่า 500 รุ่น จากทุกแบรนด์ดัง</p>
+      <div class="hero-btns">
+        <button class="btn-primary">🛒 Shop Now →</button>
+        <button class="btn-secondary">📋 Browse Models</button>
+      </div>
+    </div>
+    <!-- Motorcycle SVG Illustration -->
+    <div class="hero-moto">
+      <svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+        <!-- Sportbike silhouette -->
+        <g opacity="0.7">
+          <!-- Wheels -->
+          <circle cx="120" cy="220" r="70" fill="none" stroke="#D50000" stroke-width="8"/>
+          <circle cx="120" cy="220" r="55" fill="none" stroke="#333" stroke-width="4"/>
+          <circle cx="120" cy="220" r="15" fill="#D50000"/>
+          <circle cx="460" cy="220" r="70" fill="none" stroke="#D50000" stroke-width="8"/>
+          <circle cx="460" cy="220" r="55" fill="none" stroke="#333" stroke-width="4"/>
+          <circle cx="460" cy="220" r="15" fill="#D50000"/>
+          <!-- Spokes Front -->
+          <line x1="120" y1="150" x2="120" y2="290" stroke="#555" stroke-width="2"/>
+          <line x1="50" y1="220" x2="190" y2="220" stroke="#555" stroke-width="2"/>
+          <line x1="70" y1="170" x2="170" y2="270" stroke="#555" stroke-width="2"/>
+          <line x1="170" y1="170" x2="70" y2="270" stroke="#555" stroke-width="2"/>
+          <!-- Spokes Rear -->
+          <line x1="460" y1="150" x2="460" y2="290" stroke="#555" stroke-width="2"/>
+          <line x1="390" y1="220" x2="530" y2="220" stroke="#555" stroke-width="2"/>
+          <line x1="410" y1="170" x2="510" y2="270" stroke="#555" stroke-width="2"/>
+          <line x1="510" y1="170" x2="410" y2="270" stroke="#555" stroke-width="2"/>
+          <!-- Frame -->
+          <path d="M120 150 L180 120 L300 100 L420 130 L460 150" fill="none" stroke="#D50000" stroke-width="10" stroke-linecap="round"/>
+          <!-- Engine body -->
+          <path d="M180 150 L380 150 L400 180 L380 220 L180 220 L160 180 Z" fill="#222" stroke="#444" stroke-width="2"/>
+          <rect x="200" y="155" width="160" height="60" rx="6" fill="#1a1a1a" stroke="#333"/>
+          <!-- Engine details -->
+          <rect x="210" y="162" width="50" height="20" rx="3" fill="#D50000" opacity="0.6"/>
+          <rect x="280" y="162" width="70" height="20" rx="3" fill="#333"/>
+          <!-- Fuel tank -->
+          <path d="M220 100 L380 100 L400 130 L380 150 L220 150 L200 130 Z" fill="#D50000"/>
+          <path d="M250 100 L350 100 L360 115 L350 130 L250 130 L240 115 Z" fill="#b00000"/>
+          <!-- Seat -->
+          <path d="M300 90 L440 95 L450 120 L420 130 L300 100 Z" fill="#111" stroke="#333" stroke-width="1"/>
+          <!-- Fairing / windscreen -->
+          <path d="M130 120 L180 80 L220 70 L240 90 L220 100 L180 120 Z" fill="#D50000"/>
+          <path d="M150 110 L185 78 L215 72 L230 88 L215 98 L185 115 Z" fill="#1a1a2e" opacity="0.6"/>
+          <!-- Handlebars -->
+          <path d="M240 90 L230 70 M240 90 L260 75" stroke="#888" stroke-width="5" stroke-linecap="round"/>
+          <!-- Rider position silhouette -->
+          <ellipse cx="350" cy="80" rx="22" ry="22" fill="#1a1a1a" stroke="#333" stroke-width="2"/>
+          <path d="M330 102 L300 120 L300 180 L380 180 L380 140 L350 102 Z" fill="#1a1a1a" stroke="#333" stroke-width="2"/>
+          <!-- Exhaust -->
+          <path d="M380 200 L500 210 L510 220" fill="none" stroke="#888" stroke-width="6" stroke-linecap="round"/>
+          <!-- Suspension fork -->
+          <line x1="130" y1="150" x2="120" y2="220" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+          <line x1="160" y1="150" x2="150" y2="220" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+          <!-- Swing arm -->
+          <path d="M380 180 L460 180" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+          <!-- Ground shadow -->
+          <ellipse cx="290" cy="295" rx="200" ry="8" fill="rgba(0,0,0,0.4)"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="hero-slide" id="slide-1">
+    <div class="hero-bg hero-bg-2"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-badge" style="color:#64b5f6;border-color:rgba(100,181,246,.4);background:rgba(100,181,246,.1);">🔧 OEM Genuine Parts</div>
+      <h1 class="hero-title">อะไหล่แท้<br><span style="color:#64b5f6;">100%</span> Original</h1>
+      <p class="hero-subtitle">อะไหล่ OEM แท้จากโรงงาน พร้อมใบรับประกัน รองรับ Honda, Yamaha, Suzuki และอีกกว่า 16 แบรนด์</p>
+      <div class="hero-btns">
+        <button class="btn-primary" style="background:#1565c0;">🔩 OEM Parts</button>
+        <button class="btn-secondary">📖 Model Catalog</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-slide" id="slide-2">
+    <div class="hero-bg hero-bg-3"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-badge" style="color:#81c784;border-color:rgba(129,199,132,.4);background:rgba(129,199,132,.1);">🌏 จัดส่งทั่วโลก</div>
+      <h1 class="hero-title">Worldwide<br><span style="color:#81c784;">Delivery</span></h1>
+      <p class="hero-subtitle">จัดส่งไปกว่า 150 ประเทศทั่วโลก พร้อมระบบติดตามพัสดุแบบ Real-time</p>
+      <div class="hero-btns">
+        <button class="btn-primary" style="background:#2e7d32;">🌍 Shop Global</button>
+        <button class="btn-secondary">📦 Shipping Info</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-dots">
+    <div class="hero-dot active" onclick="goSlide(0)"></div>
+    <div class="hero-dot" onclick="goSlide(1)"></div>
+    <div class="hero-dot" onclick="goSlide(2)"></div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num"><span>50,000</span>+</div><div class="hero-stat-label">อะไหล่ในระบบ</div></div>
+    <div class="hero-stat"><div class="hero-stat-num"><span>16</span></div><div class="hero-stat-label">แบรนด์ชั้นนำ</div></div>
+    <div class="hero-stat"><div class="hero-stat-num"><span>150</span>+</div><div class="hero-stat-label">ประเทศที่จัดส่ง</div></div>
+    <div class="hero-stat"><div class="hero-stat-num"><span>98%</span></div><div class="hero-stat-label">ความพึงพอใจ</div></div>
+    <div class="hero-stat"><div class="hero-stat-num"><span>24/7</span></div><div class="hero-stat-label">ซัพพอร์ต</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<div class="section" style="padding:24px 24px;background:var(--bg-secondary);border-bottom:1px solid var(--border);">
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+      <div>
+        <div class="feature-title">อะไหล่แท้ รับประกัน</div>
+        <div class="feature-desc">สินค้า OEM จากผู้ผลิตโดยตรง พร้อมใบรับประกัน 1 ปี</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+      <div>
+        <div class="feature-title">จัดส่งทั่วโลก 150+ ประเทศ</div>
+        <div class="feature-desc">ระบบจัดส่งรวดเร็ว พร้อม Tracking แบบ Real-time</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg></div>
+      <div>
+        <div class="feature-title">ชำระเงินหลายช่องทาง</div>
+        <div class="feature-desc">Visa, Mastercard, PayPal, QR, PromptPay และอื่นๆ</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div>
+      <div>
+        <div class="feature-title">24/7 Support</div>
+        <div class="feature-desc">ทีมผู้เชี่ยวชาญพร้อมช่วยเหลือตลอด 24 ชั่วโมง</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BRAND CATEGORIES -->
+<section class="section reveal">
+  <div class="section-header">
+    <div class="section-title">แบรนด์มอเตอร์ไซค์ชั้นนำ</div>
+    <a href="#" class="section-link">ดูทั้งหมด →</a>
+  </div>
+  <div class="brand-grid">
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#fce4e4;color:#D50000;font-size:22px;">H</div>
+      <div class="brand-logo">HONDA</div>
+      <div class="brand-count">12,500+ parts</div>
+    </a>
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#e3f2fd;color:#1565c0;font-size:22px;">Y</div>
+      <div class="brand-logo">YAMAHA</div>
+      <div class="brand-count">9,800+ parts</div>
+    </a>
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#e1f5fe;color:#0288d1;font-size:22px;">S</div>
+      <div class="brand-logo">SUZUKI</div>
+      <div class="brand-count">7,200+ parts</div>
+    </a>
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#e8f5e9;color:#388e3c;font-size:22px;">K</div>
+      <div class="brand-logo">KAWASAKI</div>
+      <div class="brand-count">6,500+ parts</div>
+    </a>
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#f3e5f5;color:#7b1fa2;font-size:22px;">B</div>
+      <div class="brand-logo">BMW</div>
+      <div class="brand-count">4,100+ parts</div>
+    </a>
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#fff3e0;color:#e65100;font-size:22px;">D</div>
+      <div class="brand-logo">DUCATI</div>
+      <div class="brand-count">3,800+ parts</div>
+    </a>
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#fce4ec;color:#c62828;font-size:22px;">T</div>
+      <div class="brand-logo">TRIUMPH</div>
+      <div class="brand-count">3,200+ parts</div>
+    </a>
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#ede7f6;color:#4527a0;font-size:22px;">K</div>
+      <div class="brand-logo">KTM</div>
+      <div class="brand-count">2,900+ parts</div>
+    </a>
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#efebe9;color:#4e342e;font-size:22px;">H</div>
+      <div class="brand-logo">HARLEY</div>
+      <div class="brand-count">5,400+ parts</div>
+    </a>
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#e8eaf6;color:#283593;font-size:20px;">V</div>
+      <div class="brand-logo">VESPA</div>
+      <div class="brand-count">2,100+ parts</div>
+    </a>
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#e0f2f1;color:#00695c;font-size:20px;">RE</div>
+      <div class="brand-logo">ROYAL ENFIELD</div>
+      <div class="brand-count">1,800+ parts</div>
+    </a>
+    <a href="#" class="brand-card">
+      <div class="brand-icon" style="background:#fafafa;color:#616161;font-size:20px;">CF</div>
+      <div class="brand-logo">CFMOTO</div>
+      <div class="brand-count">1,500+ parts</div>
+    </a>
+  </div>
+</section>
+
+<!-- PROMO BANNERS -->
+<div style="padding:0 24px 40px;" class="reveal">
+  <div class="promo-grid">
+    <div class="promo-card promo-1">
+      <div class="promo-tag">⚡ Flash Sale</div>
+      <div class="promo-title">Honda PCX<br>Brake System</div>
+      <div class="promo-sub">ลดสูงสุด 40% อะไหล่ระบบเบรค</div>
+      <a href="#" class="promo-btn">ดูโปรโมชั่น →</a>
+    </div>
+    <div class="promo-card promo-2">
+      <div class="promo-tag">🆕 New Arrival</div>
+      <div class="promo-title">Yamaha R15<br>Performance Parts</div>
+      <div class="promo-sub">ชิ้นส่วน Aftermarket คุณภาพสูง</div>
+      <a href="#" class="promo-btn">ดูสินค้าใหม่ →</a>
+    </div>
+    <div class="promo-card promo-3">
+      <div class="promo-tag">🌍 Bundle Deal</div>
+      <div class="promo-title">Service Kit<br>ครบชุด</div>
+      <div class="promo-sub">เปลี่ยนถ่ายน้ำมัน ฟิลเตอร์ สปาร์คพลัก</div>
+      <a href="#" class="promo-btn">ดูชุดเซอร์วิส →</a>
+    </div>
+  </div>
+</div>
+
+<!-- FLASH SALE + PRODUCTS -->
+<section class="section" style="background:var(--bg-secondary);border-top:1px solid var(--border);" class="reveal">
+  <div class="flash-sale-header">
+    <div class="flash-badge">⚡ Flash Sale</div>
+    <div class="countdown">
+      <div class="countdown-unit"><div class="countdown-num" id="cnt-h">05</div><div class="countdown-label">hrs</div></div>
+      <span class="countdown-sep">:</span>
+      <div class="countdown-unit"><div class="countdown-num" id="cnt-m">42</div><div class="countdown-label">min</div></div>
+      <span class="countdown-sep">:</span>
+      <div class="countdown-unit"><div class="countdown-num" id="cnt-s">18</div><div class="countdown-label">sec</div></div>
+    </div>
+    <a href="#" class="section-link" style="margin-left:auto;">ดูทั้งหมด →</a>
+  </div>
+
+  <div class="cat-tabs">
+    <div class="cat-tab active">ทั้งหมด</div>
+    <div class="cat-tab">Engine Parts</div>
+    <div class="cat-tab">Brake System</div>
+    <div class="cat-tab">Electrical</div>
+    <div class="cat-tab">Body Parts</div>
+    <div class="cat-tab">Suspension</div>
+    <div class="cat-tab">Chain & Sprocket</div>
+    <div class="cat-tab">Oil & Lubricants</div>
+    <div class="cat-tab">Accessories</div>
+  </div>
+
+  <div class="product-grid">
+    <!-- Product 1 -->
+    <div class="product-card">
+      <div class="product-badge"><span class="badge badge-sale">-35%</span></div>
+      <div class="product-img">
+        <span class="product-img-placeholder">🔧</span>
+        <button class="product-wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Honda OEM</div>
+        <div class="product-name">ชุดผ้าเบรคหน้า PCX 150/160</div>
+        <div class="product-sku">SKU: 45105-KWB-901</div>
+        <div class="product-rating"><span class="stars">★★★★★</span><span class="rating-count">(124)</span></div>
+        <div class="product-price">
+          <span class="price-current">฿890</span>
+          <span class="price-original">฿1,370</span>
+          <span class="price-discount">-35%</span>
+        </div>
+        <div class="product-footer">
+          <button class="btn-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg> Add to Cart</button>
+          <button class="btn-compare"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <!-- Product 2 -->
+    <div class="product-card">
+      <div class="product-badge"><span class="badge badge-new">New</span></div>
+      <div class="product-img" style="background:#1a1a2e;">
+        <span class="product-img-placeholder">⚙️</span>
+        <button class="product-wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Yamaha OEM</div>
+        <div class="product-name">สายพานขับ NMAX 155 (2023)</div>
+        <div class="product-sku">SKU: 5B6-17641-00</div>
+        <div class="product-rating"><span class="stars">★★★★☆</span><span class="rating-count">(87)</span></div>
+        <div class="product-price">
+          <span class="price-current">฿1,250</span>
+        </div>
+        <div class="product-footer">
+          <button class="btn-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg> Add to Cart</button>
+          <button class="btn-compare"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <!-- Product 3 -->
+    <div class="product-card">
+      <div class="product-badge"><span class="badge badge-hot">Hot</span></div>
+      <div class="product-img" style="background:#1a0a00;">
+        <span class="product-img-placeholder">💡</span>
+        <button class="product-wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Aftermarket</div>
+        <div class="product-name">ไฟหน้า LED CBR150R Gen5 6000K</div>
+        <div class="product-sku">SKU: LED-CBR150-H4</div>
+        <div class="product-rating"><span class="stars">★★★★★</span><span class="rating-count">(203)</span></div>
+        <div class="product-price">
+          <span class="price-current">฿1,890</span>
+          <span class="price-original">฿2,400</span>
+          <span class="price-discount">-21%</span>
+        </div>
+        <div class="product-footer">
+          <button class="btn-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg> Add to Cart</button>
+          <button class="btn-compare"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <!-- Product 4 -->
+    <div class="product-card">
+      <div class="product-badge"><span class="badge badge-sale">-20%</span></div>
+      <div class="product-img" style="background:#0d1a0d;">
+        <span class="product-img-placeholder">🛢️</span>
+        <button class="product-wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Motul</div>
+        <div class="product-name">น้ำมันเครื่อง 300V 10W-40 1L</div>
+        <div class="product-sku">SKU: MTL-300V-1040</div>
+        <div class="product-rating"><span class="stars">★★★★★</span><span class="rating-count">(456)</span></div>
+        <div class="product-price">
+          <span class="price-current">฿680</span>
+          <span class="price-original">฿850</span>
+          <span class="price-discount">-20%</span>
+        </div>
+        <div class="product-footer">
+          <button class="btn-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg> Add to Cart</button>
+          <button class="btn-compare"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <!-- Product 5 -->
+    <div class="product-card">
+      <div class="product-badge"><span class="badge badge-new">New</span></div>
+      <div class="product-img" style="background:#1a1a1a;">
+        <span class="product-img-placeholder">🔩</span>
+        <button class="product-wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Kawasaki OEM</div>
+        <div class="product-name">ชุดโซ่-สเตอร์ Ninja 400 2023</div>
+        <div class="product-sku">SKU: 92057-0016-KIT</div>
+        <div class="product-rating"><span class="stars">★★★★☆</span><span class="rating-count">(62)</span></div>
+        <div class="product-price">
+          <span class="price-current">฿3,200</span>
+        </div>
+        <div class="product-footer">
+          <button class="btn-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg> Add to Cart</button>
+          <button class="btn-compare"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <!-- Product 6 -->
+    <div class="product-card">
+      <div class="product-badge"><span class="badge badge-hot">-28%</span></div>
+      <div class="product-img" style="background:#1a0a1a;">
+        <span class="product-img-placeholder">🏍️</span>
+        <button class="product-wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></button>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">Suzuki OEM</div>
+        <div class="product-name">แผงหน้าปัด GSX-R150 ดิจิตอล</div>
+        <div class="product-sku">SKU: 34100-16L10</div>
+        <div class="product-rating"><span class="stars">★★★★★</span><span class="rating-count">(91)</span></div>
+        <div class="product-price">
+          <span class="price-current">฿4,500</span>
+          <span class="price-original">฿6,250</span>
+          <span class="price-discount">-28%</span>
+        </div>
+        <div class="product-footer">
+          <button class="btn-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg> Add to Cart</button>
+          <button class="btn-compare"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<div class="newsletter reveal">
+  <h2 class="newsletter-title">รับข่าวสารโปรโมชั่นก่อนใคร 🔥</h2>
+  <p class="newsletter-sub">สมัครรับ Newsletter รับส่วนลด 10% สำหรับสั่งซื้อครั้งแรก</p>
+  <div class="newsletter-form">
+    <input type="email" class="newsletter-input" placeholder="อีเมล์ของคุณ...">
+    <button class="newsletter-btn">สมัครรับ</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo-text">MotoPartsHub</div>
+      <div class="footer-logo-sub">Motorcycle Parts Marketplace</div>
+      <p class="footer-desc">ตลาดซื้อขายอะไหล่มอเตอร์ไซค์ออนไลน์ครบวงจร อะไหล่แท้และอะไหล่ทดแทนจากแบรนด์ชั้นนำ รองรับการจัดส่งทั่วโลก</p>
+      <div class="social-links">
+        <a href="#" class="social-btn">f</a>
+        <a href="#" class="social-btn">ig</a>
+        <a href="#" class="social-btn">▶</a>
+        <a href="#" class="social-btn">tt</a>
+        <a href="#" class="social-btn">L</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">แบรนด์</div>
+      <div class="footer-links">
+        <a href="#" class="footer-link">Honda</a>
+        <a href="#" class="footer-link">Yamaha</a>
+        <a href="#" class="footer-link">Suzuki</a>
+        <a href="#" class="footer-link">Kawasaki</a>
+        <a href="#" class="footer-link">BMW Motorrad</a>
+        <a href="#" class="footer-link">Ducati</a>
+        <a href="#" class="footer-link">ดูแบรนด์ทั้งหมด →</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">ประเภทสินค้า</div>
+      <div class="footer-links">
+        <a href="#" class="footer-link">OEM Genuine Parts</a>
+        <a href="#" class="footer-link">Replacement Parts</a>
+        <a href="#" class="footer-link">Aftermarket Parts</a>
+        <a href="#" class="footer-link">Performance Parts</a>
+        <a href="#" class="footer-link">Racing Parts</a>
+        <a href="#" class="footer-link">Oil & Lubricants</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">บัญชีผู้ใช้</div>
+      <div class="footer-links">
+        <a href="#" class="footer-link">สมัครสมาชิก</a>
+        <a href="#" class="footer-link">เข้าสู่ระบบ</a>
+        <a href="#" class="footer-link">ประวัติคำสั่งซื้อ</a>
+        <a href="#" class="footer-link">รายการโปรด</a>
+        <a href="#" class="footer-link">คะแนนสะสม</a>
+        <a href="#" class="footer-link">ศูนย์ดาวน์โหลด</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">ช่วยเหลือ</div>
+      <div class="footer-links">
+        <a href="#" class="footer-link">เกี่ยวกับเรา</a>
+        <a href="#" class="footer-link">FAQ</a>
+        <a href="#" class="footer-link">นโยบายการคืนสินค้า</a>
+        <a href="#" class="footer-link">การรับประกัน</a>
+        <a href="#" class="footer-link">การจัดส่ง</a>
+        <a href="#" class="footer-link">ติดต่อเรา</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 MotoPartsHub.com | All Rights Reserved | สงวนลิขสิทธิ์</span>
+    <div class="footer-payments">
+      <span class="payment-badge visa">VISA</span>
+      <span class="payment-badge mc">MC</span>
+      <span class="payment-badge pp">PayPal</span>
+      <span class="payment-badge qr">PromptPay</span>
+      <span class="payment-badge">JCB</span>
+      <span class="payment-badge">UnionPay</span>
+    </div>
+  </div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-drawer-header">
+    <span class="cart-drawer-title">🛒 ตะกร้าสินค้า (5)</span>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items">
+    <div class="cart-item">
+      <div class="cart-item-img">🔧</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">ผ้าเบรคหน้า PCX 150/160</div>
+        <div class="cart-item-price">฿890</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn">−</button>
+          <span class="qty-num">2</span>
+          <button class="qty-btn">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="cart-item">
+      <div class="cart-item-img">⚙️</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">สายพานขับ NMAX 155</div>
+        <div class="cart-item-price">฿1,250</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn">−</button>
+          <span class="qty-num">1</span>
+          <button class="qty-btn">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="cart-item">
+      <div class="cart-item-img">🛢️</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">Motul 300V 10W-40 1L</div>
+        <div class="cart-item-price">฿680</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn">−</button>
+          <span class="qty-num">3</span>
+          <button class="qty-btn">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span class="cart-total-label">ยอดรวม</span>
+      <span class="cart-total-price">฿5,070</span>
+    </div>
+    <button class="btn-checkout">ดำเนินการชำระเงิน →</button>
+  </div>
+</div>
+
+<script>
+  // Hero Slider
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.hero-dot');
+  function goSlide(n) {
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide].classList.remove('active');
+    currentSlide = n;
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
+  }
+  setInterval(() => goSlide((currentSlide + 1) % slides.length), 5000);
+
+  // Countdown Timer
+  let total = 5 * 3600 + 42 * 60 + 18;
+  function updateCountdown() {
+    if (total <= 0) return;
+    total--;
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    document.getElementById('cnt-h').textContent = String(h).padStart(2,'0');
+    document.getElementById('cnt-m').textContent = String(m).padStart(2,'0');
+    document.getElementById('cnt-s').textContent = String(s).padStart(2,'0');
+  }
+  setInterval(updateCountdown, 1000);
+
+  // Cart Toggle
+  function toggleCart() {
+    document.getElementById('cartOverlay').classList.toggle('open');
+    document.getElementById('cartDrawer').classList.toggle('open');
+  }
+
+  // Cat Tabs
+  document.querySelectorAll('.cat-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  // Scroll Reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => observer.observe(r));
+
+  // Add to Cart animation
+  document.querySelectorAll('.btn-cart').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      btn.textContent = '✓ Added!';
+      btn.style.background = '#388e3c';
+      setTimeout(() => {
+        btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg> Add to Cart';
+        btn.style.background = '';
+      }, 1500);
+    });
+  });
+</script>
+</body>
+</html>
